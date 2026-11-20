@@ -10,6 +10,7 @@ Routes
 """
 
 import json
+import logging
 import re
 import sys
 from pathlib import Path
@@ -22,9 +23,18 @@ PAGES = {"/": "index.html", "/index.html": "index.html", "/shorten.html": "short
 CODE_RE = re.compile(rf"^/([0-9A-Za-z]{{{CODE_LENGTH}}})$")
 MAX_BODY = 8 * 1024
 BAD_URL = "Enter a full URL starting with http:// or https://"
+log = logging.getLogger("wsgi")
 
-# In-memory store: run a single worker process so every request sees the same links.
-shortener = Shortener()
+from settings import DATABASE_URL  # noqa: E402  (also loads .env)
+
+if DATABASE_URL:
+    # Links are stored in Postgres, so they survive restarts and are shared by all workers.
+    from db import PostgresShortener
+
+    shortener = PostgresShortener(DATABASE_URL)
+else:
+    # In-memory store: run a single worker so every request sees the same links.
+    shortener = Shortener()
 
 
 def _respond(start_response, status, body=b"", content_type="text/plain; charset=utf-8", headers=()):
@@ -48,6 +58,9 @@ def _shorten(environ, start_response):
         code = shortener.shorten(url)
     except (ValueError, KeyError, TypeError):
         return _json(start_response, "400 Bad Request", {"error": BAD_URL})
+    except Exception:
+        log.exception("could not save short link")
+        return _json(start_response, "503 Service Unavailable", {"error": "Could not save the link. Try again shortly."})
     host = environ.get("HTTP_HOST") or f"{environ['SERVER_NAME']}:{environ['SERVER_PORT']}"
     short_url = f"{environ['wsgi.url_scheme']}://{host}/{code}"
     return _json(start_response, "200 OK", {"code": code, "short_url": short_url})
@@ -75,6 +88,9 @@ def app(environ, start_response):
             url = shortener.expand(m.group(1))
         except KeyError:
             return _respond(start_response, "404 Not Found", b"Unknown short link\n")
+        except Exception:
+            log.exception("could not look up short link")
+            return _respond(start_response, "503 Service Unavailable", b"Could not look up the link. Try again shortly.\n")
         return _respond(start_response, "302 Found", headers=[("Location", url)])
 
     return _respond(start_response, "404 Not Found", b"Not found\n")

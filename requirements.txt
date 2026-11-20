@@ -1,5 +1,8 @@
 # Run in production with:  gunicorn wsgi:app
 gunicorn>=23
 
+# Postgres storage for short links (used when DATABASE_URL is set).
+psycopg[binary,pool]>=3.2
+
 # Only needed to run the tests in urlshort/tests.
 pytest>=8
