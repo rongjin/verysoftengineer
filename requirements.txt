@@ -1,3 +1,5 @@
-# server.py and the urlshort library use only the Python standard library (Python 3.9+).
-# pytest is needed only to run the tests in urlshort/tests.
+# Run in production with:  gunicorn wsgi:app
+gunicorn>=23
+
+# Only needed to run the tests in urlshort/tests.
 pytest>=8
