@@ -1,137 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rong Jin</title>
-  <meta name="description" content="Rong Jin — Busy engineer.">
-  <style>
-    :root {
-      --bg: #fafaf7;
-      --text: #1c1c1a;
-      --muted: #6b6b66;
-      --line: #e4e3dc;
-      --accent: #2f5d50;
-      --card: #ffffff;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141413;
-        --text: #ecebe6;
-        --muted: #9a9993;
-        --line: #2c2c2a;
-        --accent: #7fb8a4;
-        --card: #1c1c1b;
-      }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    main {
-      width: 100%;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 96px 24px 48px;
-      flex: 1;
-    }
-    .eyebrow {
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-    }
-    h1 {
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: 400;
-      font-size: clamp(2.6rem, 8vw, 3.6rem);
-      line-height: 1.1;
-      margin: 12px 0 16px;
-      letter-spacing: -0.01em;
-    }
-    .bio {
-      font-size: 1.15rem;
-      color: var(--muted);
-    }
-    section { margin-top: 72px; }
-    h2 {
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 20px;
-    }
-    .project {
-      display: block;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 20px 22px;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s ease, transform 0.15s ease;
-    }
-    a.project:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-    .project h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .project p {
-      color: var(--muted);
-      margin-top: 4px;
-      font-size: 0.95rem;
-    }
-    .arrow { color: var(--accent); font-weight: 400; }
-    footer {
-      max-width: 640px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 24px;
-      font-size: 0.85rem;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web App Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE occasion: a confident personal site for a web developer
+   IDEA a desk of open browser windows, each one a live app
+   PICTURE three overlapping browser windows with working mini UIs, one per app
+   COLOUR white ground, black ink, metro line colours: red, blue, amber, green per project
+   TYPE Figtree 800 display + Figtree text
+   LAYOUT laptop: title across the top, window stack full width beneath; phone: title, one window, then links */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0e1116);--ink:light-dark(#111318,#eef0f4);--soft:light-dark(#5b6170,#a3a9b6);--line:light-dark(#e3e5ea,#262b35);--panel:light-dark(#f4f5f7,#161a22);--win:light-dark(#ffffff,#1b2029);--red:#e6261f;--blue:#0a5cff;--amber:#ffb400;--green:#00a05a}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:72px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip}
+img{max-width:100%}
+a{color:inherit}
+h1,h2,h3{font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0;text-wrap:balance}
+.wrap{max-width:1240px;margin:0 auto}
+.band{padding-block:clamp(28px,4vw,64px);padding-left:max(5vw,16px);padding-right:max(5vw,16px)}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;padding:14px max(5vw,16px)}
+.logo{font-weight:800;font-size:18px;text-decoration:none;display:flex;align-items:center;gap:10px;margin-right:auto}
+.dots{display:inline-flex;gap:3px}.dots i{width:8px;height:8px;border-radius:50%;display:block}
+nav ul{display:flex;flex-wrap:wrap;gap:4px 20px;list-style:none;margin:0;padding:0}
+nav ul a{text-decoration:none;color:var(--soft);font-weight:500;padding:10px 0;display:inline-block}
+nav ul a:hover{color:var(--ink)}
+.hero h1{font-size:clamp(36px,6vw,64px);max-width:16ch}
+.hero p{font-size:18px;color:var(--soft);max-width:56ch;margin:18px 0 26px}
+.top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px 48px;align-items:end}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;font-weight:600;text-decoration:none;border:2px solid var(--ink)}
+.btn.solid{background:var(--ink);color:var(--bg)}
+.btn:hover{transform:translateY(-1px)}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.facts div{border-top:4px solid var(--c);padding-top:10px}
+.facts dt{font-size:clamp(26px,3.4vw,38px);font-weight:800;line-height:1}
+.facts dd{margin:4px 0 0;color:var(--soft);font-size:14px}
+.desk{position:relative;height:clamp(300px,38vw,440px);margin-top:clamp(28px,4vw,48px)}
+.desk .win{position:absolute;width:min(56%,620px);transition:transform .4s ease}
+.desk .win:nth-child(1){left:0;top:12%;transform:rotate(-2deg)}
+.desk .win:nth-child(2){left:22%;top:0;z-index:2}
+.desk .win:nth-child(3){right:0;top:18%;transform:rotate(2deg);z-index:1}
+.desk .win:hover{transform:translateY(-8px) rotate(0);z-index:3}
+.win{background:var(--win);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 18px 40px -24px rgba(0,0,0,.45)}
+.bar{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.bar .dots i{background:var(--line)}
+.url{flex:1;background:var(--bg);border-radius:6px;padding:3px 10px;font-size:13px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.screen{aspect-ratio:16/10;padding:16px;display:grid;gap:10px;font-size:13px}
+.ap-h{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px}
+.chip{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;color:#fff;background:var(--c)}
+/* ledger */
+.l-sc{grid-template-rows:auto auto 1fr}
+.l-big{font-size:clamp(20px,2.6vw,30px);font-weight:800;line-height:1}
+.l-bars{display:flex;align-items:flex-end;gap:6%;height:100%}
+.l-bars span{flex:1;background:color-mix(in srgb,var(--red) 30%,transparent);border-radius:4px 4px 0 0}
+.l-bars span.on{background:var(--red)}
+/* trail */
+.t-sc{grid-template-rows:auto 1fr auto}
+.t-sc svg{width:100%;height:100%;display:block}
+.t-row{display:flex;justify-content:space-between;gap:8px;color:var(--soft);white-space:nowrap}
+.t-row b{color:var(--ink)}
+/* pantry */
+.p-sc{grid-template-rows:auto 1fr}
+.p-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.p-grid div{border-radius:8px;background:var(--panel);display:grid;place-items:center;padding:6px}
+.p-grid i{width:60%;aspect-ratio:1;border-radius:50%;display:block;background:radial-gradient(circle at 35% 30%,#fff6 0 18%,transparent 19%),var(--c)}
+/* projects */
+.sec-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:28px}
+.sec-h h2{font-size:clamp(30px,4vw,44px)}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button{font:600 15px Figtree,sans-serif;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.proj{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px 48px;align-items:center;padding-block:36px;border-top:1px solid var(--line)}
+.proj:nth-child(even) .win{order:2}
+.proj h3{font-size:clamp(26px,3vw,34px);display:flex;align-items:center;gap:12px}
+.proj h3::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--c);flex:none}
+.proj p{color:var(--soft);margin:12px 0}
+.proj ul{margin:0 0 16px;padding-left:20px}
+.proj li{margin:4px 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.tags span{font-size:13px;font-weight:600;padding:4px 10px;border-radius:6px;background:color-mix(in srgb,var(--c) 14%,transparent)}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links .btn{min-height:44px;font-size:15px}
+.proj[hidden]{display:none}
+.empty{color:var(--soft);padding:24px 0}
+/* about */
+.about{background:var(--ink);color:var(--bg)}
+.about .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px 64px}
+.about h2{font-size:clamp(30px,4vw,44px);margin-bottom:16px}
+.about p{opacity:.85;max-width:60ch}
+.skills{display:grid;gap:18px}
+.skill b{display:block;margin-bottom:6px}
+.meter{height:10px;border-radius:5px;background:color-mix(in srgb,var(--bg) 18%,transparent);overflow:hidden}
+.meter i{display:block;height:100%;width:var(--w);background:var(--c);border-radius:5px}
+.skill small{opacity:.75;font-size:14px}
+/* contact */
+.contact .wrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px 48px;align-items:center}
+.contact h2{font-size:clamp(32px,4.6vw,52px)}
+.contact p{color:var(--soft)}
+.mail{font-size:clamp(18px,2.4vw,24px);font-weight:700;overflow-wrap:anywhere}
+.copy{font:600 15px Figtree,sans-serif;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;margin-top:12px}
+footer{border-top:1px solid var(--line)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:24px max(5vw,16px);color:var(--soft);font-size:14px}
+.note{font-size:13px;color:var(--soft);margin-top:14px}
+@media(max-width:900px){.top{grid-template-columns:minmax(0,1fr)}.proj{grid-template-columns:minmax(0,1fr)}.proj:nth-child(even) .win{order:0}.about .wrap,.contact .wrap{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.desk{height:auto}.desk .win{position:static;width:100%;transform:none!important}.desk .win:not(:first-child){display:none}nav ul{gap:4px 16px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
-  <main>
-    <p class="eyebrow">Hello, I'm</p>
-    <h1>Rong Jin</h1>
-    <p class="bio">Busy engineer.</p>
+<nav><div class="wrap">
+  <a class="logo" href="#top"><span class="dots"><i style="background:var(--red)"></i><i style="background:var(--amber)"></i><i style="background:var(--green)"></i></span>Alex Rivera</a>
+  <ul><li><a href="#work">Work</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li><li><a href="shorten.html">Shorten URL</a></li></ul>
+</div></nav>
 
-    <section>
-      <h2>Projects</h2>
-      <!-- To make the card clickable, change <div> to <a href="https://your-project-link"> and </div> to </a> -->
-      <div class="project">
-        <h3>Shorten-URL <span class="arrow">&rarr;</span></h3>
-        <p>A URL shortening service.</p>
-      </div>
-    </section>
-  </main>
+<header class="band hero" id="top"><div class="wrap">
+  <div class="top">
+    <div>
+      <h1>I build web apps people actually open twice.</h1>
+      <p>Full-stack developer focused on fast, friendly interfaces. Here are three apps I designed, built and shipped, from first sketch to production.</p>
+      <div class="btns"><a class="btn solid" href="#work">See the apps</a><a class="btn" href="#contact">Get in touch</a></div>
+    </div>
+    <dl class="facts">
+      <div style="--c:var(--red)"><dt>3</dt><dd>apps live</dd></div>
+      <div style="--c:var(--blue)"><dt>2.4k</dt><dd>monthly users</dd></div>
+      <div style="--c:var(--green)"><dt>5 yrs</dt><dd>building for the web</dd></div>
+    </dl>
+  </div>
+  <div class="desk" id="desk"></div>
+  <p class="note">Sample content: names, apps and numbers here are placeholders to swap for your own.</p>
+</div></header>
 
-  <footer>
-    &copy; <span id="year"></span> Rong Jin &middot; verysoftengineer.com
-  </footer>
+<section class="band" id="work"><div class="wrap">
+  <div class="sec-h"><h2>Selected work</h2><div class="filters" id="filters"></div></div>
+  <div id="projects"></div>
+  <p class="empty" id="empty" hidden>No apps use that tool yet.</p>
+</div></section>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+<section class="band about" id="about"><div class="wrap">
+  <div>
+    <h2>About me</h2>
+    <p>I started building websites for friends' bands and never stopped. Today I work across the stack: designing in Figma, writing typed front ends, and keeping APIs and databases quick and boring in the best way.</p>
+    <p>I care about load times, keyboard access and copy that a person can understand on the first read. Outside code, I'm usually on a trail or in the kitchen, which is where two of these apps came from.</p>
+  </div>
+  <div class="skills" id="skills"></div>
+</div></section>
+
+<section class="band contact" id="contact"><div class="wrap">
+  <div>
+    <h2>Have an app in mind? Let's talk.</h2>
+    <p>Open to freelance projects and full-time roles. I usually reply within a day.</p>
+  </div>
+  <div>
+    <a class="mail" href="mailto:alex@example.com">alex@example.com</a><br>
+    <button class="copy" id="copy" type="button">Copy email</button>
+    <div class="links" style="margin-top:16px">
+      <a class="btn" href="https://github.com/">GitHub</a>
+      <a class="btn" href="https://www.linkedin.com/">LinkedIn</a>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span>© 2026 Alex Rivera</span><span>Built by hand, no templates.</span></div></footer>
+
+<script>
+{
+const P=[
+ {id:'ledgerly',name:'Ledgerly',c:'var(--red)',url:'ledgerly.app/overview',tag:'Budgeting',
+  desc:'A shared budget for couples and roommates. Split bills, see who owes what, and watch monthly spending without a spreadsheet.',
+  pts:['Splits any expense by share or percentage','Bank CSV import with automatic categories','Works offline and syncs when back online'],
+  tools:['React','TypeScript','Node','PostgreSQL'],live:'#',code:'#'},
+ {id:'trailmix',name:'Trailmix',c:'var(--blue)',url:'trailmix.io/plan/ridge-loop',tag:'Hiking',
+  desc:'Plan a day hike in minutes: pick a trail, see the elevation profile, and get a turnaround time based on your pace and sunset.',
+  pts:['Elevation profiles drawn from GPX files','Pace-based timing with sunset warning','Shareable trip links for your group'],
+  tools:['Vue','Node','Mapbox'],live:'#',code:'#'},
+ {id:'pantry',name:'Pantry',c:'var(--green)',url:'pantry.cooking/this-week',tag:'Recipes',
+  desc:'Tell it what is in your fridge and it suggests meals for the week, then builds a shopping list for only what is missing.',
+  pts:['Ingredient matching across 1,200 recipes','Weekly plan with drag-to-reorder','Shopping list grouped by store aisle'],
+  tools:['React','Next.js','Supabase'],live:'#',code:'#'}
+];
+const S=[
+ {n:'Front end',d:'React, Vue, TypeScript, CSS',w:92,c:'var(--blue)'},
+ {n:'Back end',d:'Node, REST and GraphQL APIs',w:80,c:'var(--green)'},
+ {n:'Data',d:'PostgreSQL, Supabase, Redis',w:72,c:'var(--amber)'},
+ {n:'Design',d:'Figma, design systems, accessibility',w:68,c:'var(--red)'}
+];
+const screens={
+ ledgerly:()=>`<div class="screen l-sc"><div class="ap-h">November spending <span class="chip" style="--c:var(--red)">On track</span></div><div><div class="l-big">$1,842</div><span style="color:var(--soft)">of $2,300 budget</span></div><div class="l-bars">${[42,58,36,70,52,64,80].map((h,i)=>`<span class="${i==6?'on':''}" style="height:${h}%"></span>`).join('')}</div></div>`,
+ trailmix:()=>`<div class="screen t-sc"><div class="ap-h">Ridge Loop <span class="chip" style="--c:var(--blue)">7.8 mi</span></div><svg viewBox="0 0 300 110" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g${Math.random().toString(36).slice(2,6)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a5cff" stop-opacity=".55"/><stop offset="1" stop-color="#0a5cff" stop-opacity=".05"/></linearGradient></defs><path d="M0 95 C30 90 45 70 70 66 S110 30 140 22 S175 40 195 48 S235 20 255 30 S285 80 300 88 L300 110 L0 110Z" fill="#0a5cff" fill-opacity=".18"/><path d="M0 95 C30 90 45 70 70 66 S110 30 140 22 S175 40 195 48 S235 20 255 30 S285 80 300 88" fill="none" stroke="#0a5cff" stroke-width="3"/><circle cx="140" cy="22" r="5" fill="#ffb400"/></svg><div class="t-row"><span>Gain <b>2,140 ft</b></span><span>Turn back <b>2:45 pm</b></span></div></div>`,
+ pantry:()=>`<div class="screen p-sc"><div class="ap-h">This week <span class="chip" style="--c:var(--green)">5 of 7 planned</span></div><div class="p-grid">${['#e6261f','#ffb400','#00a05a','#ff7a3d','#7cc242','#c2462d'].map(c=>`<div><i style="--c:${c}"></i></div>`).join('')}</div></div>`
+};
+const win=p=>`<div class="win" style="--c:${p.c}"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">${p.url}</span></div>${screens[p.id]()}</div>`;
+document.getElementById('desk').innerHTML=P.map(win).join('');
+const proj=document.getElementById('projects');
+proj.innerHTML=P.map(p=>`<article class="proj" style="--c:${p.c}" data-tools="${p.tools.join('|')}">${win(p)}<div><h3>${p.name}</h3><p>${p.desc}</p><ul>${p.pts.map(x=>`<li>${x}</li>`).join('')}</ul><div class="tags">${p.tools.map(t=>`<span>${t}</span>`).join('')}</div><div class="links"><a class="btn solid" href="${p.live}">Open live app</a><a class="btn" href="${p.code}">View code</a></div></div></article>`).join('');
+const tools=['All',...new Set(P.flatMap(p=>p.tools))];
+const fl=document.getElementById('filters');
+fl.innerHTML=tools.map((t,i)=>`<button type="button" id="f-${t.replace(/\W/g,'')}" aria-pressed="${i==0}">${t}</button>`).join('');
+fl.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  fl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const t=b.textContent;let n=0;
+  proj.querySelectorAll('.proj').forEach(a=>{const on=t==='All'||a.dataset.tools.split('|').includes(t);a.hidden=!on;if(on)n++});
+  document.getElementById('empty').hidden=n>0;
+});
+document.getElementById('skills').innerHTML=S.map(s=>`<div class="skill" style="--c:${s.c}"><b>${s.n}</b><div class="meter"><i style="--w:${s.w}%"></i></div><small>${s.d}</small></div>`).join('');
+const cp=document.getElementById('copy');
+cp.addEventListener('click',async()=>{try{await navigator.clipboard.writeText('alex@example.com');cp.textContent='Copied'}catch(e){cp.textContent='alex@example.com'}setTimeout(()=>cp.textContent='Copy email',1800)});
+}
+</script>
 </body>
 </html>
