@@ -6,6 +6,7 @@ Local:       python3 server.py [port]
 Routes
   GET  /, /index.html, /shorten.html   the static pages
   POST /api/shorten   body {"url": "..."} -> {"code": "...", "short_url": "..."}
+  POST /api/expand    body {"short_url": "..."} (full short link or bare code) -> {"code": "...", "url": "..."}
   GET  /<code>        302 redirect to the original URL
 """
 
@@ -14,6 +15,7 @@ import logging
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "urlshort" / "src"))
@@ -23,6 +25,8 @@ PAGES = {"/": "index.html", "/index.html": "index.html", "/shorten.html": "short
 CODE_RE = re.compile(rf"^/([0-9A-Za-z]{{{CODE_LENGTH}}})$")
 MAX_BODY = 8 * 1024
 BAD_URL = "Enter a full URL starting with http:// or https://"
+BAD_SHORT = f"Enter a short link, or its {CODE_LENGTH}-character code"
+BARE_CODE_RE = re.compile(rf"^[0-9A-Za-z]{{{CODE_LENGTH}}}$")
 log = logging.getLogger("wsgi")
 
 from settings import DATABASE_URL  # noqa: E402  (also loads .env)
@@ -46,15 +50,53 @@ def _json(start_response, status, data):
     return _respond(start_response, status, json.dumps(data).encode(), "application/json")
 
 
-def _shorten(environ, start_response):
+def _read_json(environ):
+    """Return the parsed JSON body, or None if it is missing or too large."""
     try:
         length = int(environ.get("CONTENT_LENGTH") or 0)
     except ValueError:
-        length = -1
+        return None
     if not 0 < length <= MAX_BODY:
-        return _json(start_response, "400 Bad Request", {"error": "Request body missing or too large"})
+        return None
+    return json.loads(environ["wsgi.input"].read(length))
+
+
+def _code_from(short):
+    """Pull the code out of a short link like https://host/AbC123xYz9, or accept a bare code."""
+    short = short.strip()
+    if "/" in short:
+        if "://" not in short:
+            short = "http://" + short  # allow "host/code" without a scheme
+        short = urlsplit(short).path.strip("/")
+    if not BARE_CODE_RE.match(short):
+        raise ValueError(short)
+    return short
+
+
+def _expand(environ, start_response):
     try:
-        url = json.loads(environ["wsgi.input"].read(length))["url"]
+        body = _read_json(environ)
+        if body is None:
+            return _json(start_response, "400 Bad Request", {"error": "Request body missing or too large"})
+        code = _code_from(body["short_url"])
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return _json(start_response, "400 Bad Request", {"error": BAD_SHORT})
+    try:
+        url = shortener.expand(code)
+    except KeyError:
+        return _json(start_response, "404 Not Found", {"error": "No link found for that short URL"})
+    except Exception:
+        log.exception("could not look up short link")
+        return _json(start_response, "503 Service Unavailable", {"error": "Could not look up the link. Try again shortly."})
+    return _json(start_response, "200 OK", {"code": code, "url": url})
+
+
+def _shorten(environ, start_response):
+    try:
+        body = _read_json(environ)
+        if body is None:
+            return _json(start_response, "400 Bad Request", {"error": "Request body missing or too large"})
+        url = body["url"]
         code = shortener.shorten(url)
     except (ValueError, KeyError, TypeError):
         return _json(start_response, "400 Bad Request", {"error": BAD_URL})
@@ -74,6 +116,11 @@ def app(environ, start_response):
         if method != "POST":
             return _json(start_response, "405 Method Not Allowed", {"error": "Use POST"})
         return _shorten(environ, start_response)
+
+    if path == "/api/expand":
+        if method != "POST":
+            return _json(start_response, "405 Method Not Allowed", {"error": "Use POST"})
+        return _expand(environ, start_response)
 
     if method not in ("GET", "HEAD"):
         return _respond(start_response, "405 Method Not Allowed", b"Method not allowed\n")

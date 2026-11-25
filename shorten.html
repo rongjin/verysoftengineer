@@ -35,6 +35,7 @@ button:hover{transform:translateY(-1px)}
 button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 .msg{margin-top:16px;min-height:1.5em;color:var(--soft)}
 .msg.err{color:var(--red)}
+h2{font-weight:800;letter-spacing:-.01em;margin:48px 0 8px;font-size:clamp(24px,3.4vw,32px);padding-top:40px;border-top:1px solid var(--line)}
 .msg a{color:var(--ink);font-weight:700;overflow-wrap:anywhere}
 .msg .copy{min-height:36px;padding:0 14px;font-size:14px;background:transparent;color:var(--ink);border-width:1.5px;margin-left:6px}
 footer{border-top:1px solid var(--line)}
@@ -56,13 +57,23 @@ footer .wrap{padding:24px max(5vw,16px);color:var(--soft);font-size:14px}
     <button type="submit">Shorten</button>
   </form>
   <p class="msg" id="msg" aria-live="polite"></p>
+
+  <h2>Retrieve a URL</h2>
+  <p class="lead">Paste a short link to see the original long URL.</p>
+  <form id="rform" novalidate>
+    <label for="short">Short URL</label>
+    <input id="short" name="short" type="text" placeholder="https://example.com/AbC123xYz9" autocomplete="off" required>
+    <button type="submit">Retrieve URL</button>
+  </form>
+  <p class="msg" id="rmsg" aria-live="polite"></p>
 </div></main>
 
 <footer><div class="wrap">© 2026 Rong Jin</div></footer>
 
 <script>
 const form=document.getElementById('form'),input=document.getElementById('url'),msg=document.getElementById('msg');
-const show=(text,err)=>{msg.className='msg'+(err?' err':'');msg.textContent=text};
+const say=(el,text,err)=>{el.className='msg'+(err?' err':'');el.textContent=text};
+const show=(text,err)=>say(msg,text,err);
 form.addEventListener('submit',async e=>{
   e.preventDefault();
   const v=input.value.trim();
@@ -81,6 +92,21 @@ form.addEventListener('submit',async e=>{
     b.onclick=async()=>{try{await navigator.clipboard.writeText(d.short_url);b.textContent='Copied'}catch(_){}};
     msg.append(' ',b);
   }catch(_){show('Could not reach the server. Start it with: python3 server.py',true)}
+});
+const rform=document.getElementById('rform'),rinput=document.getElementById('short'),rmsg=document.getElementById('rmsg');
+rform.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const v=rinput.value.trim();
+  if(!v)return say(rmsg,'Enter a short link',true);
+  say(rmsg,'Retrieving…');
+  try{
+    const r=await fetch('/api/expand',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({short_url:v})});
+    const d=await r.json();
+    if(!r.ok)return say(rmsg,d.error||'Something went wrong',true);
+    rmsg.className='msg';
+    rmsg.replaceChildren('Original URL: ');
+    const a=document.createElement('a');a.href=d.url;a.textContent=d.url;a.rel='noopener noreferrer';a.target='_blank';rmsg.append(a);
+  }catch(_){say(rmsg,'Could not reach the server. Start it with: python3 server.py',true)}
 });
 </script>
 </body>
