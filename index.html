@@ -69,11 +69,16 @@ nav ul a:hover{color:var(--ink)}
 .s-list div{display:flex;justify-content:space-between;gap:10px;padding-top:4px;border-top:1px solid var(--line);color:var(--soft);white-space:nowrap}
 .s-list div span{overflow:hidden;text-overflow:ellipsis}
 .s-list b{color:var(--ink);font-family:ui-monospace,monospace;font-weight:600}
-/* trail */
-.t-sc{grid-template-rows:auto 1fr auto}
-.t-sc svg{width:100%;height:100%;display:block}
-.t-row{display:flex;justify-content:space-between;gap:8px;color:var(--soft);white-space:nowrap}
-.t-row b{color:var(--ink)}
+/* ticket booking */
+.k-sc{grid-template-rows:auto auto 1fr auto}
+.k-stage{height:6px;width:60%;margin:0 auto;border-bottom:3px solid var(--soft);border-radius:0 0 50% 50%/0 0 100% 100%}
+.k-grid{display:grid;grid-template-columns:repeat(6,1fr) .6fr repeat(6,1fr);gap:4px;align-content:center}
+.k-grid i{aspect-ratio:1.3;border-radius:4px 4px 2px 2px;border:1.5px solid var(--soft);display:block}
+.k-grid .h{background:var(--amber);border-color:var(--amber)}
+.k-grid .m{background:var(--blue);border-color:var(--blue)}
+.k-grid .s{background:var(--line);border-color:var(--line)}
+.k-row{display:flex;justify-content:space-between;gap:8px;color:var(--soft);white-space:nowrap}
+.k-row b{color:var(--ink)}
 /* pantry */
 .p-sc{grid-template-rows:auto 1fr}
 .p-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -125,7 +130,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <body>
 <nav><div class="wrap">
   <a class="logo" href="#top"><span class="dots"><i style="background:var(--red)"></i><i style="background:var(--amber)"></i><i style="background:var(--green)"></i></span>Rong Jin</a>
-  <ul><li><a href="#work">Work</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li><li><a href="shorten.html">Shorten URL</a></li></ul>
+  <ul><li><a href="#work">Work</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li><li><a href="shorten.html">Shorten URL</a></li><li><a href="tickets.html">Ticket Booking</a></li></ul>
 </div></nav>
 
 <header class="band hero" id="top"><div class="wrap">
@@ -155,7 +160,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
   <div>
     <h2>About me</h2>
     <p>I started building websites for friends' bands and never stopped. Today I work across the stack: designing in Figma, writing typed front ends, and keeping APIs and databases quick and boring in the best way.</p>
-    <p>I care about load times, keyboard access and copy that a person can understand on the first read. Outside code, I'm usually on a trail or in the kitchen, which is where two of these apps came from.</p>
+    <p>I care about load times, keyboard access and copy that a person can understand on the first read. Outside code, I'm usually on a trail or in the kitchen, which is where the recipe app came from.</p>
   </div>
   <div class="skills" id="skills"></div>
 </div></section>
@@ -184,10 +189,10 @@ const P=[
   desc:'Paste a long link and get a short one back. A small Python library turns each URL into a 10-character code, and a WSGI server redirects the short link to the original.',
   pts:['Same URL always gets the same 10-character code','Short links redirect straight to the original page','Runs with gunicorn, or with no installs using python3 server.py'],
   tools:['Python','gunicorn','JavaScript'],live:'shorten.html',code:'https://github.com/rongjin/verysoftengineer'},
- {id:'trailmix',name:'Trailmix',c:'var(--blue)',url:'trailmix.io/plan/ridge-loop',tag:'Hiking',
-  desc:'Plan a day hike in minutes: pick a trail, see the elevation profile, and get a turnaround time based on your pace and sunset.',
-  pts:['Elevation profiles drawn from GPX files','Pace-based timing with sunset warning','Shareable trip links for your group'],
-  tools:['Vue','Node','Mapbox'],live:'#',code:'#'},
+ {id:'tickets',name:'Ticket Booking',c:'var(--blue)',url:'localhost:8000/tickets.html',tag:'Booking',
+  desc:'A Ticketmaster-style seat booking system. Pick a seat and it is held for you for 30 seconds while you check out; if the hold runs out, the seat goes back on sale. A "Simulate 1000 buyers" button sends a rush of buyers at once and proves no seat is ever sold twice.',
+  pts:['Temporary seat holds that expire on their own','Each hold is one conditional UPDATE in Postgres, so two buyers can never both win a seat','Live 1000-buyer simulation, with a naive version that does double-sell for comparison'],
+  tools:['Python','Postgres','JavaScript'],live:'tickets.html',code:'https://github.com/rongjin/verysoftengineer'},
  {id:'pantry',name:'Pantry',c:'var(--green)',url:'pantry.cooking/this-week',tag:'Recipes',
   desc:'Tell it what is in your fridge and it suggests meals for the week, then builds a shopping list for only what is missing.',
   pts:['Ingredient matching across 1,200 recipes','Weekly plan with drag-to-reorder','Shopping list grouped by store aisle'],
@@ -201,7 +206,7 @@ const S=[
 ];
 const screens={
  shortener:()=>`<div class="screen s-sc"><div class="ap-h">Shorten a URL <span class="chip" style="--c:var(--red)">10 chars</span></div><div class="s-form"><span class="s-in">https://github.com/rongjin/verysoftengineer</span><span class="s-btn">Shorten</span></div><div class="s-out"><b>localhost:8000/Nm43RCq57U</b><span>Short link ready to copy</span></div><div class="s-list">${[['BBILT9T8BP','docs.python.org/3/library/wsgiref.html'],['bYpbihOtkI','gunicorn.org']].map(([c,u])=>`<div><b>${c}</b><span>${u}</span></div>`).join('')}</div></div>`,
- trailmix:()=>`<div class="screen t-sc"><div class="ap-h">Ridge Loop <span class="chip" style="--c:var(--blue)">7.8 mi</span></div><svg viewBox="0 0 300 110" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g${Math.random().toString(36).slice(2,6)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a5cff" stop-opacity=".55"/><stop offset="1" stop-color="#0a5cff" stop-opacity=".05"/></linearGradient></defs><path d="M0 95 C30 90 45 70 70 66 S110 30 140 22 S175 40 195 48 S235 20 255 30 S285 80 300 88 L300 110 L0 110Z" fill="#0a5cff" fill-opacity=".18"/><path d="M0 95 C30 90 45 70 70 66 S110 30 140 22 S175 40 195 48 S235 20 255 30 S285 80 300 88" fill="none" stroke="#0a5cff" stroke-width="3"/><circle cx="140" cy="22" r="5" fill="#ffb400"/></svg><div class="t-row"><span>Gain <b>2,140 ft</b></span><span>Turn back <b>2:45 pm</b></span></div></div>`,
+ tickets:()=>`<div class="screen k-sc"><div class="ap-h">Pick your seats <span class="chip" style="--c:var(--blue)">0:24 left</span></div><div class="k-stage"></div><div class="k-grid">${'sshssss.sshs|s.ssmm.hs.ss|..s.s..h.s..|.h....s.....|............'.split('|').map(r=>[...r].map((c,i)=>(i===6?'<span></span>':'')+`<i class="${c==='.'?'':c}"></i>`).join('')).join('')}</div><div class="k-row"><span>Holding <b>2 seats</b></span><span>Double-sold <b>0</b></span></div></div>`,
  pantry:()=>`<div class="screen p-sc"><div class="ap-h">This week <span class="chip" style="--c:var(--green)">5 of 7 planned</span></div><div class="p-grid">${['#e6261f','#ffb400','#00a05a','#ff7a3d','#7cc242','#c2462d'].map(c=>`<div><i style="--c:${c}"></i></div>`).join('')}</div></div>`
 };
 const win=p=>`<div class="win" style="--c:${p.c}"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">${p.url}</span></div>${screens[p.id]()}</div>`;

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticket Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0e1116);--ink:light-dark(#111318,#eef0f4);--soft:light-dark(#5b6170,#a3a9b6);--line:light-dark(#e3e5ea,#262b35);--panel:light-dark(#f4f5f7,#161a22);--sold:light-dark(#c9ccd3,#3a404c);--red:#e6261f;--blue:#0a5cff;--amber:#ffb400;--green:#00a05a}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;width:100%}
+nav{border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;padding:14px max(5vw,16px)}
+.logo{font-weight:800;font-size:18px;text-decoration:none;display:flex;align-items:center;gap:10px;margin-right:auto}
+.dots{display:inline-flex;gap:3px}.dots i{width:8px;height:8px;border-radius:50%;display:block}
+nav ul{display:flex;flex-wrap:wrap;gap:4px 20px;list-style:none;margin:0;padding:0}
+nav ul a{text-decoration:none;color:var(--soft);font-weight:500;padding:10px 0;display:inline-block}
+nav ul a:hover,nav ul a[aria-current]{color:var(--ink)}
+main{flex:1;padding:clamp(32px,6vw,72px) max(5vw,16px)}
+h1,h2,h3{font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5vw,52px);margin-bottom:12px}
+h2{font-size:clamp(26px,3.4vw,36px);margin-bottom:10px}
+h3{font-size:18px;letter-spacing:-.01em;margin-bottom:8px}
+.lead{color:var(--soft);margin:0 0 28px;max-width:66ch;font-size:17px}
+section+section{margin-top:clamp(48px,7vw,88px);padding-top:clamp(40px,5vw,64px);border-top:1px solid var(--line)}
+.split{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:28px 48px;align-items:start}
+button{font:600 16px Figtree,sans-serif;min-height:48px;padding:0 24px;border-radius:999px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink)}
+button.small{min-height:36px;padding:0 14px;font-size:14px;border-width:1.5px}
+button:hover:not(:disabled){transform:translateY(-1px)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+/* seat map */
+.hall{background:var(--panel);border-radius:16px;padding:clamp(14px,2.4vw,28px)}
+.stage{margin:0 auto 22px;width:70%;text-align:center;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);border-bottom:4px solid var(--soft);border-radius:0 0 50% 50%/0 0 100% 100%;padding-bottom:10px}
+.grid{display:grid;grid-template-columns:1.4em repeat(6,var(--s)) .8em repeat(6,var(--s)) 1.4em;gap:var(--g);justify-content:center;align-items:center;--s:clamp(18px,5.2vw,38px);--g:clamp(3px,.7vw,7px)}
+.grid .rl{font-size:12px;font-weight:700;color:var(--soft);text-align:center}
+.seat{width:var(--s);height:var(--s);min-height:0;padding:0;border-radius:7px 7px 4px 4px;border:1.5px solid var(--soft);background:var(--bg);color:var(--ink);font:700 10px Figtree,sans-serif;display:grid;place-items:center;transition:background .2s,border-color .2s}
+.seat:hover:not(:disabled){transform:translateY(-1px);border-color:var(--ink)}
+.seat.held{background:var(--amber);border-color:var(--amber);cursor:not-allowed}
+.seat.mine{background:var(--blue);border-color:var(--blue);color:#fff}
+.seat.sold{background:var(--sold);border-color:var(--sold);cursor:not-allowed}
+.seat.flash{animation:flash .5s}
+@keyframes flash{0%,100%{box-shadow:none}40%{box-shadow:0 0 0 4px var(--red)}}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:18px;font-size:14px;color:var(--soft);justify-content:center}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:14px;height:14px;border-radius:4px 4px 2px 2px;border:1.5px solid var(--soft);display:block;background:var(--bg)}
+.legend .l-mine{background:var(--blue);border-color:var(--blue)}
+.legend .l-held{background:var(--amber);border-color:var(--amber)}
+.legend .l-sold{background:var(--sold);border-color:var(--sold)}
+
+/* your seats panel */
+.panel{border:1px solid var(--line);border-radius:16px;padding:22px}
+.holds{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:10px}
+.holds li{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:center}
+.holds b{font-size:18px;min-width:2.6em}
+.timer{height:6px;border-radius:3px;background:var(--line);overflow:hidden;grid-column:1/-1}
+.timer i{display:block;height:100%;background:var(--blue);border-radius:3px;transition:width .25s linear}
+.timer.low i{background:var(--red)}
+.secs{font-variant-numeric:tabular-nums;color:var(--soft);font-weight:600}
+.empty{color:var(--soft);margin:0 0 16px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.msg{margin:16px 0 0;min-height:1.5em;color:var(--soft)}
+.msg.err{color:var(--red)}.msg.ok{color:var(--green);font-weight:600}
+.how{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);font-size:15px;color:var(--soft)}
+.how ol{margin:8px 0 0;padding-left:20px}.how li{margin:4px 0}
+.reset{margin-top:14px}
+
+/* rush */
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;margin-bottom:24px}
+.toggle{display:inline-flex;align-items:center;gap:10px;font-weight:500;cursor:pointer}
+.toggle input{width:20px;height:20px;accent-color:var(--red);margin:0}
+.mini .grid{--s:clamp(14px,3.4vw,26px);--g:clamp(2px,.5vw,5px)}
+.mini .seat{cursor:default;border-radius:5px 5px 3px 3px}
+.mini .seat:hover{transform:none;border-color:var(--soft)}
+.mini .seat.held{border-color:var(--amber)}
+.mini .seat.sold{border-color:var(--sold)}
+.mini .seat.dup{background:var(--red);border-color:var(--red);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 20px}
+.stats div{border-top:4px solid var(--c);padding-top:8px}
+.stats dt{font-size:clamp(24px,3vw,32px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.stats dd{margin:4px 0 0;color:var(--soft);font-size:14px}
+.verdict{border-radius:14px;padding:18px 20px;background:color-mix(in srgb,var(--c) 12%,transparent);border-left:6px solid var(--c);margin-bottom:18px}
+.verdict b{display:block;font-size:clamp(22px,2.8vw,30px);font-weight:800;line-height:1.15;margin-bottom:6px}
+.verdict p{margin:0;font-size:15px}
+.verdict[hidden]{display:none}
+.hot{font-size:15px;margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.hot li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:6px}
+.hot li span{color:var(--soft)}
+.where{font-size:14px;color:var(--soft);margin:0 0 14px}
+pre{background:var(--panel);border-radius:12px;padding:16px 18px;overflow-x:auto;font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:14px 0}
+.why{max-width:72ch;color:var(--soft);font-size:15px}
+.why p{margin:10px 0}
+
+footer{border-top:1px solid var(--line)}
+footer .wrap{padding:24px max(5vw,16px);color:var(--soft);font-size:14px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media(max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="index.html"><span class="dots"><i style="background:var(--red)"></i><i style="background:var(--amber)"></i><i style="background:var(--green)"></i></span>Rong Jin</a>
+  <ul><li><a href="index.html#work">Work</a></li><li><a href="index.html#about">About</a></li><li><a href="index.html#contact">Contact</a></li><li><a href="shorten.html">Shorten URL</a></li><li><a href="tickets.html" aria-current="page">Ticket Booking</a></li></ul>
+</div></nav>
+
+<main><div class="wrap">
+<section aria-labelledby="t1">
+  <h1 id="t1">Book a seat</h1>
+  <p class="lead">A Ticketmaster-style booking system. Click a seat to hold it for <b id="ttl">30</b> seconds while you check out. If you don't buy in time, the hold runs out and the seat goes back on sale for everyone. Open this page in a second window to watch one buyer's hold block the other.</p>
+  <div class="split">
+    <div class="hall">
+      <div class="stage">Stage</div>
+      <div class="grid" id="map" role="group" aria-label="Seat map"></div>
+      <div class="legend"><span><i></i>Available</span><span><i class="l-mine"></i>Held by you</span><span><i class="l-held"></i>Held by someone else</span><span><i class="l-sold"></i>Sold</span></div>
+    </div>
+    <div class="panel">
+      <h3>Your seats</h3>
+      <p class="empty" id="none">No seats held. Pick up to <span id="maxh">4</span> on the map.</p>
+      <ul class="holds" id="holds"></ul>
+      <div class="actions"><button type="button" id="buy" disabled>Buy</button><button type="button" class="ghost" id="rel" disabled>Release all</button></div>
+      <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="how">
+        <b style="color:var(--ink)">What happens when you click</b>
+        <ol>
+          <li>The server tries to mark the seat <em>held by you</em>, but only if it is free at that instant.</li>
+          <li>If someone got there first, you are turned away. You never both get it.</li>
+          <li>Buying turns your hold into a sale, but only if the hold hasn't run out.</li>
+        </ol>
+        <button type="button" class="ghost small reset" id="reset">Reset seat map</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t2">
+  <h2 id="t2">What happens when 1000 people click at once</h2>
+  <p class="lead">When tickets go on sale, thousands of buyers hit the same few front-row seats within the same second. Press the button to send 1000 simulated buyers at a fresh copy of this hall. Each one grabs a seat, thinks for a moment, then buys, changes their mind, or walks away and lets the hold expire. Buyers who are turned away try another seat that looks free.</p>
+  <div class="controls">
+    <button type="button" id="sim">Simulate 1000 buyers</button>
+    <label class="toggle"><input type="checkbox" id="unsafe"> Turn off the safeguard (read the seat, then write it)</label>
+  </div>
+  <div class="split">
+    <div class="hall mini">
+      <div class="stage">Stage</div>
+      <div class="grid" id="smap" aria-hidden="true"></div>
+      <div class="legend"><span><i></i>Available</span><span><i class="l-held"></i>Held</span><span><i class="l-sold"></i>Sold once</span><span><i style="background:var(--red);border-color:var(--red)"></i>Sold twice or more</span></div>
+    </div>
+    <div>
+      <p class="where" id="where">Not run yet.</p>
+      <div class="verdict" id="verdict" hidden aria-live="polite"><b id="vt"></b><p id="vp"></p></div>
+      <dl class="stats">
+        <div style="--c:var(--blue)"><dt id="c-req">0</dt><dd>requests from 1000 buyers</dd></div>
+        <div style="--c:var(--amber)"><dt id="c-away">0</dt><dd>turned away: seat taken</dd></div>
+        <div style="--c:var(--green)"><dt id="c-sold">0</dt><dd>tickets issued</dd></div>
+        <div style="--c:var(--red)"><dt id="c-exp">0</dt><dd>holds released or expired</dd></div>
+      </dl>
+      <h3>Most fought-over seats</h3>
+      <ul class="hot" id="hot"><li><span>Run the simulation to see them.</span></li></ul>
+    </div>
+  </div>
+  <div class="why">
+    <h3 style="color:var(--ink);margin-top:36px">Why no seat is ever sold twice</h3>
+    <p>Holding a seat is one database statement that checks and changes the seat in the same step:</p>
+<pre>UPDATE ticket_seats
+   SET status = 'held', holder = :buyer, hold_expires = now() + '30 seconds'
+ WHERE seat = 'A6'
+   AND (status = 'available' OR (status = 'held' AND hold_expires &lt;= now()))</pre>
+    <p>When 200 buyers send that for seat A6 at the same moment, Postgres locks the row and runs them one at a time, re-checking the <code>WHERE</code> for each. The first one changes the row. The other 199 find it already held, change nothing, and are told the seat is taken. An expired hold matches the <code>WHERE</code> again, so the seat goes back on sale without any cleanup job.</p>
+    <p>Tick the box above to see the naive version: read the seat, and if it looks free, write "sold". Two buyers can both read "free" before either one writes, so both are charged for the same seat.</p>
+  </div>
+</section>
+</div></main>
+
+<footer><div class="wrap">© 2026 Rong Jin</div></footer>
+
+<script>
+{
+const ROWS='ABCDEFGHIJ',PER=12,IDS=[...ROWS].flatMap(r=>Array.from({length:PER},(_,i)=>r+(i+1)));
+const $=id=>document.getElementById(id);
+const buyer=sessionStorage.getItem('buyer')||(()=>{const b=crypto.randomUUID();sessionStorage.setItem('buyer',b);return b})();
+const SERVER_DOWN='Could not reach the server. Start it with: python3 server.py';
+const say=(text,kind)=>{$('msg').className='msg'+(kind?' '+kind:'');$('msg').textContent=text};
+
+// Build a grid of seats, with row letters on both sides and an aisle down the middle.
+function build(el,tag){
+  const cells={};
+  for(const r of ROWS){
+    el.insertAdjacentHTML('beforeend',`<span class="rl">${r}</span>`);
+    for(let n=1;n<=PER;n++){
+      if(n===7)el.append(document.createElement('span'));
+      const s=document.createElement(tag);s.className='seat';
+      if(tag==='button'){s.type='button';s.dataset.seat=r+n;s.textContent=n}
+      el.append(s);cells[r+n]=s;
+    }
+    el.insertAdjacentHTML('beforeend',`<span class="rl">${r}</span>`);
+  }
+  return cells;
+}
+const seatEl=build($('map'),'button'),simEl=build($('smap'),'span');
+
+// ---- interactive seat map ----
+let state={},holdSeconds=30,mine={};   // mine: seat -> deadline (ms, local clock)
+function render(){
+  for(const id of IDS){
+    const st=state[id]||'available',el=seatEl[id],isMine=st==='held'&&mine[id];
+    el.className='seat'+(st==='sold'?' sold':isMine?' mine':st==='held'?' held':'');
+    const word=st==='sold'?'sold':isMine?'held by you, click to release':st==='held'?'held by someone else':'available';
+    el.setAttribute('aria-label',`Row ${id[0]} seat ${id.slice(1)}, ${word}`);
+  }
+  const ids=IDS.filter(id=>mine[id]);
+  $('none').hidden=ids.length>0;
+  $('holds').innerHTML=ids.map(id=>`<li data-seat="${id}"><b>${id}</b><span>Row ${id[0]}, seat ${id.slice(1)}</span><span class="secs"></span><span class="timer"><i></i></span></li>`).join('');
+  $('buy').disabled=$('rel').disabled=!ids.length;
+  $('buy').textContent=ids.length?`Buy ${ids.length} seat${ids.length>1?'s':''}`:'Buy';
+  tick();
+}
+function tick(){
+  const now=Date.now();
+  for(const li of $('holds').children){
+    const left=Math.max(0,(mine[li.dataset.seat]-now)/1000);
+    li.querySelector('.secs').textContent=`0:${String(Math.ceil(left)).padStart(2,'0')}`;
+    li.querySelector('.timer').classList.toggle('low',left<8);
+    li.querySelector('.timer i').style.width=(left/holdSeconds*100)+'%';
+  }
+  const gone=Object.keys(mine).filter(id=>mine[id]<=now);
+  if(gone.length){
+    gone.forEach(id=>{delete mine[id];state[id]='available'});
+    say(`Your hold on ${gone.join(', ')} ran out. ${gone.length>1?'They are':'It is'} back on sale.`,'err');
+    render();
+  }
+}
+function apply(d){
+  holdSeconds=d.hold_seconds;$('ttl').textContent=holdSeconds;$('maxh').textContent=d.max_holds;
+  const now=Date.now(),next={};
+  state={};
+  for(const s of d.seats){state[s.seat]=s.status;if(s.mine)next[s.seat]=now+s.expires_in*1000}
+  mine=next;render();
+}
+async function api(path,body){
+  const r=await fetch('/api/tickets/'+path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});
+  const d=await r.json();
+  return {ok:r.ok,d};
+}
+async function refresh(){
+  try{const {ok,d}=await api('seats?buyer='+encodeURIComponent(buyer));if(ok)apply(d)}catch(_){}
+}
+$('map').addEventListener('click',async e=>{
+  const el=e.target.closest('.seat');if(!el)return;
+  const id=el.dataset.seat;
+  try{
+    if(mine[id]){
+      await api('release',{buyer,seat:id});say(`Released ${id}.`);
+    }else{
+      const {ok,d}=await api('hold',{buyer,seat:id});
+      if(ok){say(`${id} is yours for ${Math.round(d.expires_in)} seconds. Buy before the timer runs out.`)}
+      else{say(d.error,'err');el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
+    }
+  }catch(_){return say(SERVER_DOWN,'err')}
+  refresh();
+});
+$('buy').addEventListener('click',async()=>{
+  const seats=IDS.filter(id=>mine[id]);
+  try{
+    const {ok,d}=await api('buy',{buyer,seats});
+    say(ok?`Booked ${seats.join(', ')}. Enjoy the show.`:d.error,ok?'ok':'err');
+  }catch(_){return say(SERVER_DOWN,'err')}
+  refresh();
+});
+$('rel').addEventListener('click',async()=>{
+  try{await Promise.all(IDS.filter(id=>mine[id]).map(seat=>api('release',{buyer,seat})));say('Released your seats.')}
+  catch(_){return say(SERVER_DOWN,'err')}
+  refresh();
+});
+$('reset').addEventListener('click',async()=>{
+  try{await api('reset',{});say('Every seat is available again.')}catch(_){return say(SERVER_DOWN,'err')}
+  refresh();
+});
+refresh();
+setInterval(refresh,2000);
+setInterval(tick,250);
+
+// ---- 1000-buyer rush ----
+const fmt=n=>(n||0).toLocaleString();
+function paint(seats,dups){
+  IDS.forEach((id,i)=>{
+    const c=seats[i];
+    simEl[id].className='seat'+(dups&&dups.has(id)?' dup':c==='s'?' sold':c==='h'?' held':'');
+  });
+}
+function counters(c){
+  $('c-req').textContent=fmt(c.requests);$('c-away').textContent=fmt(c.turned_away);
+  $('c-sold').textContent=fmt(c.sold);$('c-exp').textContent=fmt((c.released||0)+(c.walked_away||0)+(c.hold_expired||0));
+}
+function result(r){
+  const dups=new Set(r.double_examples.map(x=>x.seat));
+  const v=$('verdict');v.hidden=false;
+  if(r.double_sold_seats===0&&r.mismatched_seats.length===0){
+    v.style.setProperty('--c','var(--green)');
+    $('vt').textContent='✓ 0 seats sold twice';
+    $('vp').textContent=`${fmt(r.tickets_issued)} tickets issued for ${r.sold_seats} sold seats: one buyer per seat, and the database agrees with every buyer about who owns what. ${r.unsold_seats?`${r.unsold_seats} seat${r.unsold_seats>1?'s were':' was'} given up near the end and never resold.`:'The hall sold out.'}`;
+  }else{
+    v.style.setProperty('--c','var(--red)');
+    $('vt').textContent=`✗ ${r.double_sold_seats} seats sold twice or more`;
+    $('vp').textContent=`${fmt(r.tickets_issued)} tickets issued for only ${r.sold_seats} seats. ${r.extra_tickets} buyers were told they got a seat that the database says belongs to someone else.`;
+  }
+  // Mark every double-sold seat red, not just the examples.
+  r.mismatched_seats.forEach(id=>dups.add(id));
+  $('hot').innerHTML=r.hottest.map(h=>`<li><b>${h.seat}</b><span>${fmt(h.tries)} buyers tried · ${h.sold_to===1?'1 got it':h.sold_to===0?'nobody kept it':`<strong style="color:var(--red)">${h.sold_to} were sold it</strong>`}</span></li>`).join('');
+  $('where').textContent=`${r.safe?'Safeguard on':'Safeguard off'} · ${r.store==='postgres'?'Postgres':'in-memory store'} · finished in ${(r.elapsed_ms/1000).toFixed(1)} s`;
+  return dups;
+}
+$('sim').addEventListener('click',async()=>{
+  const btn=$('sim'),safe=!$('unsafe').checked;
+  btn.disabled=true;btn.textContent='1000 buyers racing…';
+  $('verdict').hidden=true;$('hot').innerHTML='<li><span>Waiting for the run to finish…</span></li>';
+  paint('.'.repeat(IDS.length));counters({});
+  try{
+    const r=await fetch('/api/tickets/simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({safe})});
+    if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Something went wrong')}
+    const reader=r.body.getReader(),dec=new TextDecoder();let buf='';
+    for(;;){
+      const {value,done}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let i;
+      while((i=buf.indexOf('\n'))>=0){
+        const m=JSON.parse(buf.slice(0,i));buf=buf.slice(i+1);
+        if(m.type==='start')$('where').textContent=`${m.safe?'Safeguard on':'Safeguard off'} · ${m.store==='postgres'?'Postgres':'in-memory store'} · running…`;
+        if(m.type==='progress'){paint(m.seats);counters(m.counts);$('where').textContent=$('where').textContent.replace(/·[^·]*$/,`· ${(m.elapsed_ms/1000).toFixed(1)} s`)}
+        if(m.type==='result'){counters(m.result.counts);paint(m.seats,result(m.result))}
+        if(m.type==='error')throw new Error(m.error);
+      }
+    }
+  }catch(e){
+    $('where').textContent=e instanceof TypeError?SERVER_DOWN:e.message;
+  }finally{btn.disabled=false;btn.textContent='Simulate 1000 buyers'}
+});
+}
+</script>
+</body>
+</html>
